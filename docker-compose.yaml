@@ -3,6 +3,7 @@ version: '3.8'
 services:
   mariadb:
     image: mariadb:10.6.4-focal
+    container_name: minitwitter-db
     command: '--default-authentication-plugin=mysql_native_password'
     volumes:
       - m223_project_mariadb:/var/lib/mysql
@@ -13,10 +14,11 @@ services:
       - MYSQL_USER=minitwitter
       - MYSQL_PASSWORD=supersecret123
     ports:
-      - 3306:3306
+      - "3306:3306"
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
+    container_name: minitwitter-phpmyadmin
     depends_on:
       - mariadb
     restart: always
@@ -25,7 +27,25 @@ services:
       - PMA_PORT=3306
       - MYSQL_ROOT_PASSWORD=supersecret123
     ports:
-      - 9200:80
+      - "9200:80"
+
+  app:
+    build: .
+    container_name: minitwitter-app
+    depends_on:
+      - mariadb
+    ports:
+      - "4200:4200"
+    environment:
+      - DB_HOST=mariadb
+      - DB_USER=minitwitter
+      - DB_PASSWORD=supersecret123
+      - DB_NAME=minitwitter
+      - NODE_ENV=development
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
 
 volumes:
   m223_project_mariadb:
