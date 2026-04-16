@@ -5,10 +5,54 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/style.css" />
-    <script src="client.js"></script>
-    <title>Typescript Starter</title>
+    <script defer src="/client.js"></script>
+    <title>MiniTwitter</title>
   </head>
   <body>
-    <h1>Simple Typescript Starter</h1>
+    <div class="container">
+      <h1>MiniTwitter</h1>
+
+      <section class="card">
+        <h2>Registrieren</h2>
+        <form id="register-form">
+          <input id="register-username" type="text" placeholder="Benutzername" required />
+          <input id="register-password" type="password" placeholder="Passwort" required />
+          <button type="submit">Registrieren</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Login</h2>
+        <form id="login-form">
+          <input id="login-username" type="text" placeholder="Benutzername" required />
+          <input id="login-password" type="password" placeholder="Passwort" required />
+          <button type="submit">Einloggen</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Aktueller User</h2>
+        <p id="current-user">Nicht eingeloggt</p>
+      </section>
+
+      <section class="card">
+        <h2>Beitrag erstellen</h2>
+        <form id="post-form">
+          <textarea id="post-content" placeholder="Was denkst du gerade?" required></textarea>
+          <button type="submit">Posten</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Feed</h2>
+        <button id="load-posts-btn" type="button">Beiträge laden</button>
+        <div id="posts"></div>
+      </section>
+
+      <section class="card">
+        <h2>Status</h2>
+        <p id="status-message">Bereit</p>
+      </section>
+    </div>
   </body>
 </html>

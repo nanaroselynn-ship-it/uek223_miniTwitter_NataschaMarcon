@@ -62,4 +62,23 @@ router.delete('/comments/:id', async (req: Request, res: Response) => {
   }
 })
 
+router.get('/comments/:postId', async (req: Request, res: Response) => {
+  try {
+    const postId = Number(req.params.postId)
+
+    const comments = await commentService.getCommentsByPostId(postId)
+
+    res.status(200).json({
+      message: 'Kommentare geladen',
+      comments,
+    })
+  } catch (error) {
+    console.log('COMMENT GET ERROR:', error)
+    res.status(500).json({
+      message: 'Kommentare laden fehlgeschlagen',
+      error,
+    })
+  }
+})
+
 export default router

@@ -58,4 +58,24 @@ export class CommentService {
       WHERE id = ${id}
     `)
   }
+
+  public async getCommentsByPostId(postId: number): Promise<Comment[]> {
+    const result = await this.database.executeSQL(`
+      SELECT * FROM comments
+      WHERE postId = ${postId}
+      ORDER BY createdAt DESC
+    `)
+
+    if (!Array.isArray(result)) {
+      return []
+    }
+
+    return result.map((row: any) => {
+      const comment = new Comment(row.content, row.authorId, row.postId)
+      comment.id = row.id
+      comment.createdAt = row.createdAt
+      comment.updatedAt = row.updatedAt
+      return comment
+    })
+  }
 }

@@ -5,8 +5,8 @@ const app = express()
 
 app.use(express.json())
 
-app.get('/', (_req, res) => {
-  res.send('MiniTwitter Server läuft halllelujaah')
+app.get('/', (req, res) => {
+  res.sendFile('index.html', { root: 'client' })
 })
 
 app.use('/api', apiRouter)
