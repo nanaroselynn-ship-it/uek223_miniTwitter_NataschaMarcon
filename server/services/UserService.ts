@@ -46,4 +46,39 @@ export class UserService {
     const user = new User(trimmedUsername, passwordHash, 'USER', false)
     return user
   }
+
+  public async login(username: string, password: string): Promise<User> {
+    if (!username || !password) {
+      throw new Error('Benutzername und Passwort sind erforderlich')
+    }
+
+    const trimmedUsername = username.trim()
+
+    const result = await this.database.executeSQL(
+      `SELECT * FROM users WHERE username = '${trimmedUsername}'`
+    )
+
+    if (!Array.isArray(result) || result.length === 0) {
+      throw new Error('Benutzer nicht gefunden')
+    }
+
+    const dbUser = result[0]
+
+    const passwordMatches = await bcrypt.compare(password, dbUser.passwordHash)
+
+    if (!passwordMatches) {
+      throw new Error('Falsches Passwort')
+    }
+
+    const user = new User(
+      dbUser.username,
+      dbUser.passwordHash,
+      dbUser.role,
+      Boolean(dbUser.isBlocked)
+    )
+
+    user.id = dbUser.id
+
+    return user
+  }
 }
