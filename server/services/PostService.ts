@@ -33,19 +33,21 @@ export class PostService {
   }
 
   public async getAllPosts(): Promise<any[]> {
-    const result = await this.database.executeSQL(`
-      SELECT 
-        p.*,
-        COALESCE(SUM(CASE WHEN r.type = 'LIKE' THEN 1 ELSE 0 END), 0) AS likeCount,
-        COALESCE(SUM(CASE WHEN r.type = 'DISLIKE' THEN 1 ELSE 0 END), 0) AS dislikeCount
-      FROM posts p
-      LEFT JOIN reactions r ON p.id = r.postId
-      GROUP BY p.id
-      ORDER BY p.createdAt DESC
-    `)
+  const result = await this.database.executeSQL(`
+    SELECT 
+      p.*,
+      u.username,
+      COALESCE(SUM(CASE WHEN r.type = 'LIKE' THEN 1 ELSE 0 END), 0) AS likeCount,
+      COALESCE(SUM(CASE WHEN r.type = 'DISLIKE' THEN 1 ELSE 0 END), 0) AS dislikeCount
+    FROM posts p
+    LEFT JOIN users u ON p.authorId = u.id
+    LEFT JOIN reactions r ON p.id = r.postId
+    GROUP BY p.id
+    ORDER BY p.createdAt DESC
+  `)
 
-    return Array.isArray(result) ? result : []
-  }
+  return Array.isArray(result) ? result : []
+}
 
   public async getPostById(id: number): Promise<any | null> {
     const result = await this.database.executeSQL(`

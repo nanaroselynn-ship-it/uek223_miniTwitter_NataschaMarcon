@@ -51,6 +51,10 @@ function updateCurrentUserUI() {
 async function loadComments(postId) {
   const container = document.getElementById(`comments-${postId}`)
 
+  if (!container) {
+    return
+  }
+
   try {
     const response = await fetch(`${API_BASE}/comments/${postId}`)
     const data = await response.json()
@@ -96,7 +100,7 @@ async function loadPosts() {
 
       postElement.innerHTML = `
         <div class="post-meta">
-          Post-ID: ${post.id} | User-ID: ${post.authorId}
+         👤 ${post.username || 'Unbekannt'} | Post-ID: ${post.id}
         </div>
 
         <div class="post-content">${post.content}</div>
@@ -106,6 +110,7 @@ async function loadPosts() {
           <span>👎 ${post.dislikeCount || 0}</span>
           <button onclick="react(${post.id}, 'LIKE')">👍 Like</button>
           <button onclick="react(${post.id}, 'DISLIKE')">👎 Dislike</button>
+          <button class="edit-btn">✏️ Bearbeiten</button>
           <button onclick="deletePost(${post.id})">🗑 Beitrag löschen</button>
         </div>
 
@@ -124,6 +129,11 @@ async function loadPosts() {
       const commentBtn = postElement.querySelector('.comment-btn')
       if (commentBtn) {
         commentBtn.addEventListener('click', () => createComment(post.id))
+      }
+
+      const editBtn = postElement.querySelector('.edit-btn')
+      if (editBtn) {
+        editBtn.addEventListener('click', () => editPost(post.id, post.content))
       }
 
       loadComments(post.id)
@@ -197,6 +207,37 @@ async function react(postId, type) {
     loadPosts()
   } catch (error) {
     setStatus('Fehler bei Reaction')
+    console.error(error)
+  }
+}
+
+async function editPost(postId, oldContent) {
+  if (!currentUser) {
+    setStatus('Bitte zuerst einloggen')
+    return
+  }
+
+  const newContent = prompt('Neuen Inhalt eingeben:', oldContent)
+
+  if (!newContent || !newContent.trim()) {
+    setStatus('Beitrag darf nicht leer sein')
+    return
+  }
+
+  try {
+    const response = await fetch(`${API_BASE}/posts/${postId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content: newContent,
+      }),
+    })
+
+    const data = await response.json()
+    setStatus(data.message || 'Beitrag aktualisiert')
+    loadPosts()
+  } catch (error) {
+    setStatus('Fehler beim Bearbeiten')
     console.error(error)
   }
 }
