@@ -63,8 +63,9 @@ router.put('/posts/:id', async (req: Request, res: Response) => {
 router.delete('/posts/:id', async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id)
+    const { userId, userRole } = req.body
 
-    await postService.deletePost(id)
+    await postService.deletePost(id, userId, userRole)
 
     res.status(200).json({
       message: 'Beitrag gelöscht',

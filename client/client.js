@@ -105,11 +105,12 @@ async function loadPosts() {
           <span>👎 ${post.dislikeCount || 0}</span>
           <button onclick="react(${post.id}, 'LIKE')">👍 Like</button>
           <button onclick="react(${post.id}, 'DISLIKE')">👎 Dislike</button>
+          <button onclick="deletePost(${post.id})">🗑 Löschen</button>
         </div>
 
         <div class="comment-form">
           <input id="comment-input-${post.id}" type="text" placeholder="Kommentar schreiben" />
-          <button class="comment-btn" data-post-id="${post.id}">Kommentieren</button>
+          <button class="comment-btn">Kommentieren</button>
         </div>
 
         <div id="comments-${post.id}" class="comments-box">
@@ -195,6 +196,37 @@ async function react(postId, type) {
     loadPosts()
   } catch (error) {
     setStatus('Fehler bei Reaction')
+    console.error(error)
+  }
+}
+
+async function deletePost(postId) {
+  if (!currentUser) {
+    setStatus('Bitte zuerst einloggen')
+    return
+  }
+
+  const confirmed = confirm('Beitrag wirklich löschen?')
+
+  if (!confirmed) {
+    return
+  }
+
+  try {
+    const response = await fetch(`${API_BASE}/posts/${postId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: currentUser.id,
+        userRole: currentUser.role,
+      }),
+    })
+
+    const data = await response.json()
+    setStatus(data.message || 'Beitrag gelöscht')
+    loadPosts()
+  } catch (error) {
+    setStatus('Fehler beim Löschen')
     console.error(error)
   }
 }
@@ -289,3 +321,4 @@ logoutBtn.addEventListener('click', () => {
 updateCurrentUserUI()
 
 window.react = react
+window.deletePost = deletePost

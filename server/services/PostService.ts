@@ -47,6 +47,20 @@ export class PostService {
     return Array.isArray(result) ? result : []
   }
 
+  public async getPostById(id: number): Promise<any | null> {
+    const result = await this.database.executeSQL(`
+      SELECT * FROM posts
+      WHERE id = ${id}
+      LIMIT 1
+    `)
+
+    if (!Array.isArray(result) || result.length === 0) {
+      return null
+    }
+
+    return result[0]
+  }
+
   public async updatePost(id: number, content: string): Promise<void> {
     if (!content) {
       throw new Error('Inhalt ist erforderlich')
@@ -67,7 +81,31 @@ export class PostService {
     `)
   }
 
-  public async deletePost(id: number): Promise<void> {
+  public async deletePost(id: number, userId: number, userRole: string): Promise<void> {
+    const post = await this.getPostById(id)
+
+    if (!post) {
+      throw new Error('Beitrag nicht gefunden')
+    }
+
+    const isOwner = post.authorId === userId
+    const isModerator = userRole === 'MODERATOR'
+    const isAdmin = userRole === 'ADMIN'
+
+    if (!isOwner && !isModerator && !isAdmin) {
+      throw new Error('Keine Berechtigung zum Löschen dieses Beitrags')
+    }
+
+    await this.database.executeSQL(`
+      DELETE FROM comments
+      WHERE postId = ${id}
+    `)
+
+    await this.database.executeSQL(`
+      DELETE FROM reactions
+      WHERE postId = ${id}
+    `)
+
     await this.database.executeSQL(`
       DELETE FROM posts
       WHERE id = ${id}
