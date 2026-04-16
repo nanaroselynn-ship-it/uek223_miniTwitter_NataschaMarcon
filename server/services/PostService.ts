@@ -50,4 +50,31 @@ export class PostService {
       return post
     })
   }
+
+  public async updatePost(id: number, content: string): Promise<void> {
+    if (!content) {
+      throw new Error('Inhalt ist erforderlich')
+    }
+
+    const trimmedContent = content.trim()
+
+    if (trimmedContent.length === 0) {
+      throw new Error('Beitrag darf nicht leer sein')
+    }
+
+    const now = new Date().toISOString().slice(0, 19).replace('T', ' ')
+
+    await this.database.executeSQL(`
+      UPDATE posts
+      SET content = '${trimmedContent}', updatedAt = '${now}'
+      WHERE id = ${id}
+    `)
+  }
+
+  public async deletePost(id: number): Promise<void> {
+    await this.database.executeSQL(`
+      DELETE FROM posts
+      WHERE id = ${id}
+    `)
+  }
 }
