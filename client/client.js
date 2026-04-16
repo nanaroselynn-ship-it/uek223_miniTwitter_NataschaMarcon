@@ -11,19 +11,68 @@ const API_BASE = 'http://localhost:4200/api'
 
 let currentUser = null
 
+const authView = document.getElementById('auth-view')
+const appView = document.getElementById('app-view')
 const statusMessage = document.getElementById('status-message')
 const currentUserText = document.getElementById('current-user')
 const postsContainer = document.getElementById('posts')
+const logoutBtn = document.getElementById('logout-btn')
 
 function setStatus(message) {
   statusMessage.textContent = message
 }
 
+function showAuthView() {
+  authView.classList.remove('hidden-view')
+  authView.classList.add('active-view')
+
+  appView.classList.remove('active-view')
+  appView.classList.add('hidden-view')
+}
+
+function showAppView() {
+  appView.classList.remove('hidden-view')
+  appView.classList.add('active-view')
+
+  authView.classList.remove('active-view')
+  authView.classList.add('hidden-view')
+}
+
 function updateCurrentUserUI() {
   if (currentUser) {
     currentUserText.textContent = `${currentUser.username} (ID: ${currentUser.id}, Rolle: ${currentUser.role})`
+    showAppView()
   } else {
     currentUserText.textContent = 'Nicht eingeloggt'
+    showAuthView()
+  }
+}
+
+async function loadComments(postId) {
+  const container = document.getElementById(`comments-${postId}`)
+
+  try {
+    const response = await fetch(`${API_BASE}/comments/${postId}`)
+    const data = await response.json()
+    const comments = data.comments || []
+
+    if (comments.length === 0) {
+      container.innerHTML = '<p class="empty-text">Keine Kommentare</p>'
+      return
+    }
+
+    container.innerHTML = comments
+      .map(
+        (comment) => `
+          <div class="comment-item">
+            💬 ${comment.content} <span class="post-meta">(User ${comment.authorId})</span>
+          </div>
+        `
+      )
+      .join('')
+  } catch (error) {
+    container.innerHTML = '<p class="empty-text">Fehler beim Laden der Kommentare</p>'
+    console.error(error)
   }
 }
 
@@ -31,13 +80,12 @@ async function loadPosts() {
   try {
     const response = await fetch(`${API_BASE}/posts`)
     const data = await response.json()
+    const posts = data.posts || []
 
     postsContainer.innerHTML = ''
 
-    const posts = data.posts || []
-
     if (posts.length === 0) {
-      postsContainer.innerHTML = '<p>Keine Beiträge vorhanden.</p>'
+      postsContainer.innerHTML = '<p class="empty-text">Keine Beiträge vorhanden.</p>'
       return
     }
 
@@ -49,13 +97,104 @@ async function loadPosts() {
         <div class="post-meta">
           Post-ID: ${post.id} | User-ID: ${post.authorId}
         </div>
-        <div>${post.content}</div>
+
+        <div class="post-content">${post.content}</div>
+
+        <div class="reaction-row">
+          <span>👍 ${post.likeCount || 0}</span>
+          <span>👎 ${post.dislikeCount || 0}</span>
+          <button onclick="react(${post.id}, 'LIKE')">👍 Like</button>
+          <button onclick="react(${post.id}, 'DISLIKE')">👎 Dislike</button>
+        </div>
+
+        <div class="comment-form">
+          <input id="comment-input-${post.id}" type="text" placeholder="Kommentar schreiben" />
+          <button class="comment-btn" data-post-id="${post.id}">Kommentieren</button>
+        </div>
+
+        <div id="comments-${post.id}" class="comments-box">
+          <p class="empty-text">Lade Kommentare...</p>
+        </div>
       `
 
       postsContainer.appendChild(postElement)
+
+      const commentBtn = postElement.querySelector('.comment-btn')
+      if (commentBtn) {
+        commentBtn.addEventListener('click', () => createComment(post.id))
+      }
+
+      loadComments(post.id)
     })
   } catch (error) {
     setStatus('Fehler beim Laden der Beiträge')
+    console.error(error)
+  }
+}
+
+async function createComment(postId) {
+  if (!currentUser) {
+    setStatus('Bitte zuerst einloggen')
+    return
+  }
+
+  const input = document.getElementById(`comment-input-${postId}`)
+
+  if (!input) {
+    setStatus('Kommentarfeld nicht gefunden')
+    return
+  }
+
+  const content = input.value
+
+  if (!content.trim()) {
+    setStatus('Kommentar darf nicht leer sein')
+    return
+  }
+
+  try {
+    const response = await fetch(`${API_BASE}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content,
+        authorId: currentUser.id,
+        postId,
+      }),
+    })
+
+    const data = await response.json()
+    setStatus(data.message || 'Kommentar erstellt')
+    input.value = ''
+    loadComments(postId)
+  } catch (error) {
+    setStatus('Fehler beim Erstellen des Kommentars')
+    console.error(error)
+  }
+}
+
+async function react(postId, type) {
+  if (!currentUser) {
+    setStatus('Bitte zuerst einloggen')
+    return
+  }
+
+  try {
+    const response = await fetch(`${API_BASE}/reactions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type,
+        userId: currentUser.id,
+        postId,
+      }),
+    })
+
+    const data = await response.json()
+    setStatus(data.message || `Reaction ${type} gespeichert`)
+    loadPosts()
+  } catch (error) {
+    setStatus('Fehler bei Reaction')
     console.error(error)
   }
 }
@@ -99,6 +238,7 @@ document.getElementById('login-form').addEventListener('submit', async (event) =
     if (data.user) {
       currentUser = data.user
       updateCurrentUserUI()
+      loadPosts()
     }
 
     setStatus(data.message || 'Login abgeschlossen')
@@ -130,7 +270,6 @@ document.getElementById('post-form').addEventListener('submit', async (event) =>
 
     const data = await response.json()
     setStatus(data.message || 'Beitrag erstellt')
-
     document.getElementById('post-content').value = ''
     loadPosts()
   } catch (error) {
@@ -141,5 +280,12 @@ document.getElementById('post-form').addEventListener('submit', async (event) =>
 
 document.getElementById('load-posts-btn').addEventListener('click', loadPosts)
 
+logoutBtn.addEventListener('click', () => {
+  currentUser = null
+  updateCurrentUserUI()
+  setStatus('Erfolgreich ausgeloggt')
+})
+
 updateCurrentUserUI()
-loadPosts()
+
+window.react = react

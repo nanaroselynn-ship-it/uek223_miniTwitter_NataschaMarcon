@@ -32,23 +32,19 @@ export class PostService {
     return new Post(trimmedContent, authorId)
   }
 
-  public async getAllPosts(): Promise<Post[]> {
+  public async getAllPosts(): Promise<any[]> {
     const result = await this.database.executeSQL(`
-      SELECT * FROM posts
-      ORDER BY createdAt DESC
+      SELECT 
+        p.*,
+        COALESCE(SUM(CASE WHEN r.type = 'LIKE' THEN 1 ELSE 0 END), 0) AS likeCount,
+        COALESCE(SUM(CASE WHEN r.type = 'DISLIKE' THEN 1 ELSE 0 END), 0) AS dislikeCount
+      FROM posts p
+      LEFT JOIN reactions r ON p.id = r.postId
+      GROUP BY p.id
+      ORDER BY p.createdAt DESC
     `)
 
-    if (!Array.isArray(result)) {
-      return []
-    }
-
-    return result.map((row: any) => {
-      const post = new Post(row.content, row.authorId)
-      post.id = row.id
-      post.createdAt = row.createdAt
-      post.updatedAt = row.updatedAt
-      return post
-    })
+    return Array.isArray(result) ? result : []
   }
 
   public async updatePost(id: number, content: string): Promise<void> {

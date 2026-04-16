@@ -9,50 +9,62 @@
     <title>MiniTwitter</title>
   </head>
   <body>
-    <div class="container">
-      <h1>MiniTwitter</h1>
+    <div class="app">
+      <header class="hero">
+        <h1>🐣 MiniTwitter 🐣</h1>
+        <p>🍓 Lets discuss! 🍓</p>
+      </header>
 
-      <section class="card">
-        <h2>Registrieren</h2>
-        <form id="register-form">
-          <input id="register-username" type="text" placeholder="Benutzername" required />
-          <input id="register-password" type="password" placeholder="Passwort" required />
-          <button type="submit">Registrieren</button>
-        </form>
-      </section>
+      <main class="layout">
+        <div id="auth-view" class="view active-view">
+          <section class="panel">
+            <h2>Registrieren</h2>
+            <form id="register-form" class="form">
+              <input id="register-username" type="text" placeholder="Benutzername" required />
+              <input id="register-password" type="password" placeholder="Passwort" required />
+              <button type="submit">Registrieren</button>
+            </form>
+          </section>
 
-      <section class="card">
-        <h2>Login</h2>
-        <form id="login-form">
-          <input id="login-username" type="text" placeholder="Benutzername" required />
-          <input id="login-password" type="password" placeholder="Passwort" required />
-          <button type="submit">Einloggen</button>
-        </form>
-      </section>
+          <section class="panel">
+            <h2>Login</h2>
+            <form id="login-form" class="form">
+              <input id="login-username" type="text" placeholder="Benutzername" required />
+              <input id="login-password" type="password" placeholder="Passwort" required />
+              <button type="submit">Einloggen</button>
+            </form>
+          </section>
+        </div>
 
-      <section class="card">
-        <h2>Aktueller User</h2>
-        <p id="current-user">Nicht eingeloggt</p>
-      </section>
+        <div id="app-view" class="view hidden-view">
+          <section class="panel">
+            <h2>Aktueller User</h2>
+            <p id="current-user">Nicht eingeloggt</p>
+            <button id="logout-btn" type="button">Logout</button>
+          </section>
 
-      <section class="card">
-        <h2>Beitrag erstellen</h2>
-        <form id="post-form">
-          <textarea id="post-content" placeholder="Was denkst du gerade?" required></textarea>
-          <button type="submit">Posten</button>
-        </form>
-      </section>
+          <section class="panel panel-wide">
+            <h2>Neuen Beitrag erstellen</h2>
+            <form id="post-form" class="form">
+              <textarea id="post-content" placeholder="Was möchtest du teilen?" required></textarea>
+              <button type="submit">Beitrag posten</button>
+            </form>
+          </section>
 
-      <section class="card">
-        <h2>Feed</h2>
-        <button id="load-posts-btn" type="button">Beiträge laden</button>
-        <div id="posts"></div>
-      </section>
+          <section class="panel panel-wide">
+            <div class="feed-header">
+              <h2>Feed</h2>
+              <button id="load-posts-btn" type="button">Feed aktualisieren</button>
+            </div>
+            <div id="posts" class="posts"></div>
+          </section>
+        </div>
 
-      <section class="card">
-        <h2>Status</h2>
-        <p id="status-message">Bereit</p>
-      </section>
+        <section class="panel panel-wide">
+          <h2>Status</h2>
+          <p id="status-message">Bereit</p>
+        </section>
+      </main>
     </div>
   </body>
 </html>
