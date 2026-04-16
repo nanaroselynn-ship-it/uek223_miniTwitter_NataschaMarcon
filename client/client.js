@@ -66,6 +66,7 @@ async function loadComments(postId) {
         (comment) => `
           <div class="comment-item">
             💬 ${comment.content} <span class="post-meta">(User ${comment.authorId})</span>
+            <button onclick="deleteComment(${comment.id}, ${postId})">🗑 Kommentar löschen</button>
           </div>
         `
       )
@@ -105,7 +106,7 @@ async function loadPosts() {
           <span>👎 ${post.dislikeCount || 0}</span>
           <button onclick="react(${post.id}, 'LIKE')">👍 Like</button>
           <button onclick="react(${post.id}, 'DISLIKE')">👎 Dislike</button>
-          <button onclick="deletePost(${post.id})">🗑 Löschen</button>
+          <button onclick="deletePost(${post.id})">🗑 Beitrag löschen</button>
         </div>
 
         <div class="comment-form">
@@ -226,7 +227,38 @@ async function deletePost(postId) {
     setStatus(data.message || 'Beitrag gelöscht')
     loadPosts()
   } catch (error) {
-    setStatus('Fehler beim Löschen')
+    setStatus('Fehler beim Löschen des Beitrags')
+    console.error(error)
+  }
+}
+
+async function deleteComment(commentId, postId) {
+  if (!currentUser) {
+    setStatus('Bitte zuerst einloggen')
+    return
+  }
+
+  const confirmed = confirm('Kommentar wirklich löschen?')
+
+  if (!confirmed) {
+    return
+  }
+
+  try {
+    const response = await fetch(`${API_BASE}/comments/${commentId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: currentUser.id,
+        userRole: currentUser.role,
+      }),
+    })
+
+    const data = await response.json()
+    setStatus(data.message || 'Kommentar gelöscht')
+    loadComments(postId)
+  } catch (error) {
+    setStatus('Fehler beim Löschen des Kommentars')
     console.error(error)
   }
 }
@@ -322,3 +354,4 @@ updateCurrentUserUI()
 
 window.react = react
 window.deletePost = deletePost
+window.deleteComment = deleteComment

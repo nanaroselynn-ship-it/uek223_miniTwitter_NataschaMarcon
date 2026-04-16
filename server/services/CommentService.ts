@@ -52,13 +52,6 @@ export class CommentService {
     `)
   }
 
-  public async deleteComment(id: number): Promise<void> {
-    await this.database.executeSQL(`
-      DELETE FROM comments
-      WHERE id = ${id}
-    `)
-  }
-
   public async getCommentsByPostId(postId: number): Promise<Comment[]> {
     const result = await this.database.executeSQL(`
       SELECT * FROM comments
@@ -77,5 +70,40 @@ export class CommentService {
       comment.updatedAt = row.updatedAt
       return comment
     })
+  }
+
+  public async getCommentById(id: number): Promise<any | null> {
+    const result = await this.database.executeSQL(`
+      SELECT * FROM comments
+      WHERE id = ${id}
+      LIMIT 1
+    `)
+
+    if (!Array.isArray(result) || result.length === 0) {
+      return null
+    }
+
+    return result[0]
+  }
+
+  public async deleteComment(id: number, userId: number, userRole: string): Promise<void> {
+    const comment = await this.getCommentById(id)
+
+    if (!comment) {
+      throw new Error('Kommentar nicht gefunden')
+    }
+
+    const isOwner = comment.authorId === userId
+    const isModerator = userRole === 'MODERATOR'
+    const isAdmin = userRole === 'ADMIN'
+
+    if (!isOwner && !isModerator && !isAdmin) {
+      throw new Error('Keine Berechtigung zum Löschen dieses Kommentars')
+    }
+
+    await this.database.executeSQL(`
+      DELETE FROM comments
+      WHERE id = ${id}
+    `)
   }
 }

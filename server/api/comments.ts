@@ -47,8 +47,9 @@ router.put('/comments/:id', async (req: Request, res: Response) => {
 router.delete('/comments/:id', async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id)
+    const { userId, userRole } = req.body
 
-    await commentService.deleteComment(id)
+    await commentService.deleteComment(id, userId, userRole)
 
     res.status(200).json({
       message: 'Kommentar gelöscht',
