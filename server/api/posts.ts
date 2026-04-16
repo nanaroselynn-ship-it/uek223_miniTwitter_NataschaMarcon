@@ -16,8 +16,11 @@ router.post('/posts', async (req: Request, res: Response) => {
       },
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Fehler'
-    res.status(400).json({ message })
+    console.log('POST CREATE ERROR:', error)
+    res.status(400).json({
+      message: 'Post fehlgeschlagen',
+      error,
+    })
   }
 })
 
@@ -30,8 +33,11 @@ router.get('/posts', async (_req: Request, res: Response) => {
       posts,
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Fehler'
-    res.status(500).json({ message })
+    console.log('POST GET ERROR:', error)
+    res.status(500).json({
+      message: 'Posts laden fehlgeschlagen',
+      error,
+    })
   }
 })
 
@@ -46,8 +52,11 @@ router.put('/posts/:id', async (req: Request, res: Response) => {
       message: 'Beitrag aktualisiert',
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Fehler'
-    res.status(400).json({ message })
+    console.log('POST UPDATE ERROR:', error)
+    res.status(400).json({
+      message: 'Post Update fehlgeschlagen',
+      error,
+    })
   }
 })
 
@@ -61,8 +70,11 @@ router.delete('/posts/:id', async (req: Request, res: Response) => {
       message: 'Beitrag gelöscht',
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Fehler'
-    res.status(500).json({ message })
+    console.log('POST DELETE ERROR:', error)
+    res.status(500).json({
+      message: 'Post Delete fehlgeschlagen',
+      error,
+    })
   }
 })
 

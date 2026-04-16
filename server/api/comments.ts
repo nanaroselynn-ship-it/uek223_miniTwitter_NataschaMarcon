@@ -17,8 +17,11 @@ router.post('/comments', async (req: Request, res: Response) => {
       },
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Fehler'
-    res.status(400).json({ message })
+    console.log('COMMENT CREATE ERROR:', error)
+    res.status(400).json({
+      message: 'Kommentar erstellen fehlgeschlagen',
+      error,
+    })
   }
 })
 
@@ -33,8 +36,11 @@ router.put('/comments/:id', async (req: Request, res: Response) => {
       message: 'Kommentar aktualisiert',
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Fehler'
-    res.status(400).json({ message })
+    console.log('COMMENT UPDATE ERROR:', error)
+    res.status(400).json({
+      message: 'Kommentar Update fehlgeschlagen',
+      error,
+    })
   }
 })
 
@@ -48,8 +54,11 @@ router.delete('/comments/:id', async (req: Request, res: Response) => {
       message: 'Kommentar gelöscht',
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Fehler'
-    res.status(500).json({ message })
+    console.log('COMMENT DELETE ERROR:', error)
+    res.status(500).json({
+      message: 'Kommentar Delete fehlgeschlagen',
+      error,
+    })
   }
 })
 

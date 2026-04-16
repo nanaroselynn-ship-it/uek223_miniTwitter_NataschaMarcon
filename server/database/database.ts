@@ -1,6 +1,7 @@
 import * as mariadb from 'mariadb'
 import { Pool } from 'mariadb'
 import { USER_TABLE, POST_TABLE, COMMENT_TABLE,REACTION_TABLE} from './schema'
+import { error } from 'node:console'
 
 export class Database {
   // Properties
@@ -37,6 +38,7 @@ export class Database {
       return res
     } catch (err) {
       console.log('SQL Fehler:', err)
+      throw error
     } finally {
       if (conn) conn.end() 
     }
