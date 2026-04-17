@@ -1,9 +1,11 @@
 import { Router, Request, Response } from 'express'
 import { PostService } from '../services/PostService'
 
+// Initialize router and post service logic
 const router = Router()
 const postService = new PostService()
 
+// Create a new post
 router.post('/posts', async (req: Request, res: Response) => {
   try {
     const post = await postService.createPost(req.body)
@@ -24,6 +26,7 @@ router.post('/posts', async (req: Request, res: Response) => {
   }
 })
 
+// Retrieve all posts
 router.get('/posts', async (_req: Request, res: Response) => {
   try {
     const posts = await postService.getAllPosts()
@@ -41,6 +44,7 @@ router.get('/posts', async (_req: Request, res: Response) => {
   }
 })
 
+// Update an existing post by ID
 router.put('/posts/:id', async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id)
@@ -60,6 +64,7 @@ router.put('/posts/:id', async (req: Request, res: Response) => {
   }
 })
 
+// Delete a post by ID with permission check
 router.delete('/posts/:id', async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id)

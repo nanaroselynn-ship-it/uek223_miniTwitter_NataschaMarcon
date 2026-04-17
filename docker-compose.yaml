@@ -1,9 +1,12 @@
+# Docker Compose schema version
 version: '3.8'
 
 services:
+  # Database service using MariaDB
   mariadb:
     image: mariadb:10.6.4-focal
     container_name: minitwitter-db
+    # Use legacy authentication for compatibility with some drivers
     command: '--default-authentication-plugin=mysql_native_password'
     volumes:
       - m223_project_mariadb:/var/lib/mysql
@@ -16,6 +19,7 @@ services:
     ports:
       - "3306:3306"
 
+  # Database management tool (Web UI)
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: minitwitter-phpmyadmin
@@ -29,6 +33,7 @@ services:
     ports:
       - "9200:80"
 
+  # The Node.js application service
   app:
     build: .
     container_name: minitwitter-app
@@ -44,8 +49,10 @@ services:
       - NODE_ENV=development
     volumes:
       - .:/app
+      # Ensure node_modules are kept within the container
       - /app/node_modules
     command: npm run dev
 
+# Named volume for persistent database storage
 volumes:
   m223_project_mariadb:

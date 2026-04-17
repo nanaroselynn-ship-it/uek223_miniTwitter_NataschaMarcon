@@ -1,3 +1,4 @@
+// Model class representing a User entity
 export class User {
   public id?: number
   public username: string
@@ -17,10 +18,12 @@ export class User {
     this.isBlocked = isBlocked
   }
 
+  // Getter for the private password hash
   public getPasswordHash(): string {
     return this.passwordHash
   }
 
+  // Setter to update the private password hash
   public setPasswordHash(passwordHash: string): void {
     this.passwordHash = passwordHash
   }

@@ -1,9 +1,11 @@
 import { Router, Request, Response } from 'express'
 import { CommentService } from '../services/CommentService'
 
+// Initialize router and comment service logic
 const router = Router()
 const commentService = new CommentService()
 
+// Endpoint to create a new comment
 router.post('/comments', async (req: Request, res: Response) => {
   try {
     const comment = await commentService.createComment(req.body)
@@ -25,6 +27,7 @@ router.post('/comments', async (req: Request, res: Response) => {
   }
 })
 
+// Update an existing comment by its ID
 router.put('/comments/:id', async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id)
@@ -44,6 +47,7 @@ router.put('/comments/:id', async (req: Request, res: Response) => {
   }
 })
 
+// Delete a comment by ID with permission verification
 router.delete('/comments/:id', async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id)
@@ -63,6 +67,7 @@ router.delete('/comments/:id', async (req: Request, res: Response) => {
   }
 })
 
+// Retrieve all comments associated with a specific post ID
 router.get('/comments/:postId', async (req: Request, res: Response) => {
   try {
     const postId = Number(req.params.postId)

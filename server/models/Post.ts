@@ -1,3 +1,4 @@
+// Model class representing a Post entity
 export class Post {
     public id?: number
     public content: string

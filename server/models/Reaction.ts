@@ -1,3 +1,4 @@
+// Model class representing a Reaction (Like/Dislike) entity
 export class Reaction {
     public id?: number
     public type: string

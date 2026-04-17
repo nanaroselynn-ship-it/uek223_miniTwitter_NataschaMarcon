@@ -1,3 +1,4 @@
+// SQL schema for the users table including credentials, roles, and status
 const USER_TABLE = `
   CREATE TABLE IF NOT EXISTS users (
     id INT NOT NULL AUTO_INCREMENT,
@@ -10,6 +11,7 @@ const USER_TABLE = `
     PRIMARY KEY (id)
   );`
 
+// SQL schema for the posts table with a foreign key reference to the author
 const POST_TABLE = `
   CREATE TABLE IF NOT EXISTS posts (
     id INT NOT NULL AUTO_INCREMENT,
@@ -21,6 +23,7 @@ const POST_TABLE = `
     FOREIGN KEY (authorId) REFERENCES users(id)
   );`
 
+// SQL schema for the comments table linking both users and posts
 const COMMENT_TABLE = `
   CREATE TABLE IF NOT EXISTS comments (
     id INT NOT NULL AUTO_INCREMENT,
@@ -34,6 +37,7 @@ const COMMENT_TABLE = `
     FOREIGN KEY (postId) REFERENCES posts(id)
   );`
 
+// SQL schema for reactions with a unique constraint to prevent multiple reactions per user/post
 const REACTION_TABLE = `
   CREATE TABLE IF NOT EXISTS reactions (
     id INT NOT NULL AUTO_INCREMENT,
