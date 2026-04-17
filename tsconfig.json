@@ -1,13 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "strict": true,
-    "types": ["node"],
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "types": ["jest", "node"],
     "skipLibCheck": true,
-    "ignoreDeprecations": "6.0"
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
   },
-  "include": ["server/**/*"]
+  "include": ["server/**/*.ts", "tests/**/*.ts"],
+  "exclude": ["node_modules"]
 }
