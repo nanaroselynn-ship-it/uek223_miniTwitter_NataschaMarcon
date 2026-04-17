@@ -9,11 +9,6 @@ MiniTwitter ist eine einfache Social-Media-Webanwendung, bei der Benutzer:
 * Beiträge liken oder disliken
 * Inhalte bearbeiten und löschen können
 
-Zusätzlich gibt es Rollen:
-
-* User
-* Moderator
-* Admin
 
 ---
 
